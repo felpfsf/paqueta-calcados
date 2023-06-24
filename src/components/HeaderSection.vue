@@ -48,11 +48,14 @@ import FavoriteBtn from "./FavoriteBtn.vue";
 </template>
 
 <style scoped>
+header {
+  margin-bottom: 1.125rem;
+}
 .header__top {
   color: var(--clr-neutral);
   background: linear-gradient(92.46deg, #ff8a29 31.2%, #cf5d00 71.97%);
-  padding-block: .75rem;
-  padding-inline: .5rem;
+  padding-block: 0.75rem;
+  padding-inline: 0.5rem;
   display: none;
 }
 .header__top-logo {
@@ -74,18 +77,15 @@ import FavoriteBtn from "./FavoriteBtn.vue";
   align-items: center;
   justify-content: space-between;
 }
-
 .list__item {
   font-weight: 500;
   display: flex;
   align-items: center;
-  gap: .75rem;
+  gap: 0.75rem;
 }
-
 .header__secondary-navigation {
   margin-top: 2.75rem;
 }
-
 .header__secondary-menu {
   display: flex;
   align-items: center;
