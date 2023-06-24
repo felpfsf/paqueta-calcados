@@ -12,6 +12,7 @@
     "axios": "^1.4.0",
     "lucide-vue-next": "^0.252.0",
     "pinia": "^2.1.4",
+    "swiper": "^9.4.1",
     "vue": "^3.2.47",
     "vue-router": "4"
   },
