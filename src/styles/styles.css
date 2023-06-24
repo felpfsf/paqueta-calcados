@@ -1,15 +1,114 @@
-@import './normalize.css';
+@import "./normalize.css";
 
 :root {
-  --clr-text-primary: #383838;
+  --clr-gray-900: #121212;
+  --clr-gray-700: #383838;
+  --clr-neutral: #fafafa;
   --clr-accent: #cf5d00;
-  --clr-light: #fff;
+  --clr-danger: #ef4444;
+
+  --text-xs-font-size: 0.75rem; /* 12px */
+  --text-xs-line-height: 1rem; /* 16px */
+
+  --text-sm-font-size: 0.875rem; /* 14px */
+  --text-sm-line-height: 1.25rem; /* 20px */
+
+  --text-base-font-size: 1rem; /* 16px */
+  --text-base-line-height: 1.5rem; /* 24px */
+
+  --text-lg-font-size: 1.125rem; /* 18px */
+  --text-lg-line-height: 1.75rem; /* 28px */
+
+  --text-xl-font-size: 1.25rem; /* 20px */
+  --text-xl-line-height: 1.75rem; /* 28px */
+
+  --text-2xl-font-size: 1.5rem; /* 24px */
+  --text-2xl-line-height: 2rem; /* 32px */
+
+  --text-3xl-font-size: 1.875rem; /* 30px */
+  --text-3xl-line-height: 2.25rem; /* 36px */
+
+  --text-4xl-font-size: 2.25rem; /* 36px */
+  --text-4xl-line-height: 2.5rem; /* 40px */
+
+  --text-5xl-font-size: 3rem; /* 48px */
+  --text-5xl-line-height: 1;
+
+  --text-6xl-font-size: 3.75rem; /* 60px */
+  --text-6xl-line-height: 1;
+
+  --text-7xl-font-size: 4.5rem; /* 72px */
+  --text-7xl-line-height: 1;
+
+  --text-8xl-font-size: 6rem; /* 96px */
+  --text-8xl-line-height: 1;
+
+  --text-9xl-font-size: 8rem; /* 128px */
+  --text-9xl-line-height: 1;
+
+  --scr-sm: "640px";
+  --scr-md: "768px";
+  --scr-lg: "960px";
+  --scr-xl: "1440px";
+}
+
+.text-xs {
+  font-size: var(--text-xs-font-size);
+  line-height: var(--text-xs-line-height);
+}
+.text-sm {
+  font-size: var(--text-sm-font-size);
+  line-height: var(--text-sm-line-height);
+}
+.text-base {
+  font-size: var(--text-base-font-size);
+  line-height: var(--text-base-line-height);
+}
+.text-lg {
+  font-size: var(--text-lg-font-size);
+  line-height: var(--text-lg-line-height);
+}
+.text-xl {
+  font-size: var(--text-xl-font-size);
+  line-height: var(--text-xl-line-height);
+}
+.text-2xl {
+  font-size: var(--text-2xl-font-size);
+  line-height: var(--text-2xl-line-height);
+}
+.text-3xl {
+  font-size: var(--text-3xl-font-size);
+  line-height: var(--text-3xl-line-height);
+}
+.text-4xl {
+  font-size: var(--text-4xl-font-size);
+  line-height: var(--text-4xl-line-height);
+}
+.text-5xl {
+  font-size: var(--text-5xl-font-size);
+  line-height: var(--text-5xl-line-height);
+}
+.text-6xl {
+  font-size: var(--text-6xl-font-size);
+  line-height: var(--text-6xl-line-height);
+}
+.text-7xl {
+  font-size: var(--text-7xl-font-size);
+  line-height: var(--text-7xl-line-height);
+}
+.text-8xl {
+  font-size: var(--text-8xl-font-size);
+  line-height: var(--text-8xl-line-height);
+}
+.text-9xl {
+  font-size: var(--text-9xl-font-size);
+  line-height: var(--text-9xl-line-height);
 }
 
 html,
 body {
-  font-family: 'Poppins', sans-serif;
-  color: var(--clr-text-primary);
+  font-family: "Poppins", sans-serif;
+  color: var(--clr-gray-700);
 }
 
 .content__wrapper {
