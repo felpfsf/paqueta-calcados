@@ -1,0 +1,19 @@
+@import './normalize.css';
+
+:root {
+  --clr-text-primary: #383838;
+  --clr-accent: #cf5d00;
+  --clr-light: #fff;
+}
+
+html,
+body {
+  font-family: 'Poppins', sans-serif;
+  color: var(--clr-text-primary);
+}
+
+.content__wrapper {
+  width: 100%;
+  max-width: 90rem;
+  margin: 0 auto;
+}
