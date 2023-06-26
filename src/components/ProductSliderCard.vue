@@ -1,7 +1,11 @@
 <script lang="ts">
+import { useCartStore } from "@/stores/cartStore";
+import { useFavoriteStore } from "@/stores/favoriteStore";
 import { ShoesProps } from "@/types/shoes.models";
 
 import { Heart } from "lucide-vue-next";
+import { computed } from "vue";
+
 export default {
   name: "ProductSliderCard",
   props: {
@@ -11,6 +15,34 @@ export default {
     },
   },
   components: { Heart },
+  setup(props) {
+    const product = props.product;
+    const cartStore = useCartStore();
+    const favoriteStore = useFavoriteStore()
+
+    const addProductToFavorite = () => {
+      favoriteStore.addToFavorites(product)
+    };
+
+    const toggleFavorite = () => {
+      if(isFavorited.value){
+        favoriteStore.removeFromFavorites(product)
+      } else {
+        favoriteStore.addToFavorites(product)
+      }
+    }
+
+    const addItemToCart = () => {
+      cartStore.addItem(product)
+    };
+
+    const isFavorited = computed(()=>{
+      const favoriteItem = favoriteStore.items
+      return favoriteItem.some(item => item.id === product.id)
+    })
+
+    return { addItemToCart, addProductToFavorite, isFavorited, toggleFavorite };
+  },
 };
 </script>
 
@@ -22,9 +54,9 @@ export default {
       <h2 class="text-xl product__value">R$ {{ product.price.value }}</h2>
       <h4 class="text-xs product__sub">OU 9X R$ 16,66</h4>
     </div>
-    <button class="button">Comprar</button>
-    <button class="favorite">
-      <Heart />
+    <button class="button" @click="addItemToCart">Comprar</button>
+    <button class="favorite" :style="{color: isFavorited ? 'red' : ''}" @click="toggleFavorite">
+      <Heart  />
     </button>
   </div>
 </template>
@@ -64,5 +96,13 @@ export default {
   fill: red;
   color: transparent;
   transition: all 0.2s ease-in-out;
+}
+.favorite--active{
+  fill: red;
+  color: transparent;
+}
+.favorite--normal{
+  fill:inherit;
+  color:inherit;
 }
 </style>
