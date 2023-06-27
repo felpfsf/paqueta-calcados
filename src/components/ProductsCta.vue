@@ -10,7 +10,7 @@
           <strong>variedade de modelos e cores</strong> não será uma tarefa fácil, mas o que uma
           mulher não consegue fazer?
         </p>
-        <a href="#" class="button">Conferir</a>
+        <a href="#" class="button gradient--button link-section">Conferir</a>
       </div>
     </div>
     <!-- 2 -->
@@ -23,7 +23,7 @@
           Tenha em seu guarda roupa sapatos de qualidade e confortáveis, para o dia a dia, trabalho
           e até mesmo para praticar esportes!
         </p>
-        <a href="#" class="button">Conferir</a>
+        <a href="#" class="button gradient--button link-section">Conferir</a>
       </div>
     </div>
   </section>
@@ -36,19 +36,6 @@
   display: flex;
   flex-direction: column;
   gap: 6.5rem;
-}
-.button {
-  background: linear-gradient(122.71deg, #f99500 53.34%, #ffcd29 133.06%);
-  color: white;
-  padding: 0.75rem 4rem;
-  border-radius: 6px;
-  font-size: 18px;
-  font-weight: 700;
-  line-height: 110%;
-  transition: background 0.5s ease-in-out;
-}
-.button:hover {
-  filter: brightness(90%);
 }
 .section__row {
   display: flex;
