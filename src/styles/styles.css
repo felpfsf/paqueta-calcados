@@ -144,7 +144,6 @@ body {
 
 .sold--out {
   background-color: var(--clr-accent);
-  cursor: not-allowed;
   font-size: 16px;
   font-weight: 600;
 }

@@ -54,14 +54,13 @@ export default {
       <h2 class="text-xl product__value">R$ {{ product.price.value }}</h2>
       <h4 class="text-xs product__sub">OU 9X R$ 16,66</h4>
     </div>
-    <button
+    <RouterLink
       class="button"
       :class="{ 'sold--out': product.soldout, 'gradient--button': !product.soldout }"
-      :disabled="product.soldout"
-      @click="addItemToCart"
+      :to="`/product/${product.id}`"
     >
       {{ product.soldout ? "Me Avise Quando Chegar" : "Comprar" }}
-    </button>
+    </RouterLink>
     <button class="favorite" @click="toggleFavorite">
       <Heart :class="{ 'favorite--active': isFavorited }" />
     </button>
@@ -79,6 +78,8 @@ export default {
   border-radius: 0.375rem;
   box-shadow: 0px 4px 21px 0px rgba(0, 0, 0, 0.1);
   overflow: hidden;
+  display: flex;
+  flex-direction: column;
 }
 .product__name {
   font-weight: 500;
