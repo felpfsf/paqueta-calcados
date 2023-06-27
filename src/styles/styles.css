@@ -4,6 +4,8 @@
   --clr-gray-900: #121212;
   --clr-gray-700: #383838;
   --clr-neutral: #fafafa;
+  --clr-primary: #f99500;
+  --clr-secondary: #ffcd29;
   --clr-accent: #cf5d00;
   --clr-danger: #ef4444;
 
@@ -117,19 +119,34 @@ body {
   margin: 0 auto;
 }
 
+.gradient--button {
+  background: linear-gradient(122.71deg, var(--clr-primary) 53.34%, var(--clr-secondary) 133.06%);
+}
+
 .button {
-  background: linear-gradient(122.71deg, #f99500 53.34%, #ffcd29 133.06%);
-  color: var(--clr-neutral);
-  padding: 0.75rem 4rem;
-  border-radius: 6px;
-  font-size: 18px;
+  font-size: 16px;
   font-weight: 700;
   line-height: 110%;
-  transition: background 0.5s ease-in-out;
   text-transform: uppercase;
+  text-align: center;
+  color: var(--clr-neutral);
+  width: 100%;
+  max-width: 16rem;
+  padding: 0.75rem 1rem;
+  border-radius: 6px;
+  transition: all 0.3s ease-in-out;
 }
-.button:hover {
-  filter: brightness(90%);
+
+.button:not(:disabled):hover {
+  background-color: var(--clr-primary);
+  box-shadow: 0 4px 4px rgba(0, 0, 0, 0.1);
+}
+
+.sold--out {
+  background-color: var(--clr-accent);
+  cursor: not-allowed;
+  font-size: 16px;
+  font-weight: 600;
 }
 
 .mainSlider {
