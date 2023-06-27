@@ -37,7 +37,7 @@ export default {
     };
 
     const isFavorited = computed(()=>{
-      const favoriteItem = favoriteStore.items
+      const favoriteItem = favoriteStore.favoriteItems
       return favoriteItem.some(item => item.id === product.id)
     })
 
@@ -55,8 +55,8 @@ export default {
       <h4 class="text-xs product__sub">OU 9X R$ 16,66</h4>
     </div>
     <button class="button" @click="addItemToCart">Comprar</button>
-    <button class="favorite" :style="{color: isFavorited ? 'red' : ''}" @click="toggleFavorite">
-      <Heart  />
+    <button class="favorite"  @click="toggleFavorite">
+      <Heart :class="{'favorite--active': isFavorited}" />
     </button>
   </div>
 </template>
@@ -100,9 +100,5 @@ export default {
 .favorite--active{
   fill: red;
   color: transparent;
-}
-.favorite--normal{
-  fill:inherit;
-  color:inherit;
 }
 </style>
