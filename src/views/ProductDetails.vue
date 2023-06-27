@@ -1,7 +1,7 @@
 <template>
-  <div class="content__wrapper">
+  <main class="content__wrapper">
     <h1>Details</h1>
-  </div>
+  </main>
 </template>
 
 <script lang="ts">
