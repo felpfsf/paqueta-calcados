@@ -44,7 +44,7 @@ export default {
 
 <template>
   <div class="product__card">
-    <img :src="product.image" :alt="product.name" />
+    <img :src="product.image" :alt="product.name" class="product__image" />
     <h1 class="product__name text-sm">{{ product.name }}</h1>
     <div class="product__price-container">
       <h2 class="text-xl product__value">R$ {{ product.price.value }}</h2>
@@ -79,6 +79,11 @@ export default {
   overflow: hidden;
   display: flex;
   flex-direction: column;
+}
+.product__image{
+  width: 16rem;
+  height: 16rem;
+  object-fit: cover;
 }
 .product__name {
   font-weight: 500;
