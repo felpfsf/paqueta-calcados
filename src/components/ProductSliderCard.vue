@@ -20,10 +20,6 @@ export default {
     const cartStore = useCartStore();
     const favoriteStore = useFavoriteStore();
 
-    const addProductToFavorite = () => {
-      favoriteStore.addToFavorites(product);
-    };
-
     const toggleFavorite = () => {
       if (isFavorited.value) {
         favoriteStore.removeFromFavorites(product);
@@ -41,7 +37,7 @@ export default {
       return favoriteItem.some((item) => item.id === product.id);
     });
 
-    return { addItemToCart, addProductToFavorite, isFavorited, toggleFavorite };
+    return { addItemToCart, isFavorited, toggleFavorite };
   },
 };
 </script>
@@ -56,7 +52,10 @@ export default {
     </div>
     <RouterLink
       class="button"
-      :class="{ 'sold--out': product.soldout, 'gradient--button': !product.soldout }"
+      :class="{
+        'sold--out': product.soldout,
+        'gradient--button': !product.soldout,
+      }"
       :to="`/product/${product.id}`"
     >
       {{ product.soldout ? "Me Avise Quando Chegar" : "Comprar" }}
@@ -103,14 +102,13 @@ export default {
   position: absolute;
   top: 10%;
   right: 8%;
+  color: var(--clr-accent);
 }
 .favorite:hover svg {
-  fill: var(--clr-danger);
-  color: var(--clr-danger);
+  fill: var(--clr-accent);
 }
 .favorite--active {
-  fill: var(--clr-danger);
-  color: var(--clr-danger);
+  fill: var(--clr-accent);
 }
 .is-soldout {
   position: absolute;
