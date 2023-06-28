@@ -10,13 +10,24 @@ export default defineComponent({
     const product = ref<ShoesProps | null>(null);
     const route = useRoute();
 
+    const GET_RANDOM_LENGTH = Math.floor(Math.random() * 7) + 1;
+    const randomSizes = Array.from(
+      { length: GET_RANDOM_LENGTH },
+      (_, i) => i + 34
+    );
+    const sizes = Array.from({ length: 7 }, (_, i) => i + 34);
     const fetchProduct = async () => {
       try {
         const { id } = route.params;
-        console.log(id);
+        // console.log(id);
         const response = await api.get(`/shoe/${id}`);
-        console.log("Produto -> ", response.data[0]);
-        product.value = response.data[0];
+        // console.log("Produto -> ", response.data[0]);
+
+        const productData = response.data[0];
+        productData.sizes = randomSizes;
+        console.log(productData);
+        product.value = productData;
+        console.log(product);
       } catch (error) {
         console.error(error);
       }
@@ -60,6 +71,7 @@ export default defineComponent({
       productDiscountCalc,
       discountedPrice,
       getInstallments,
+      sizes,
     };
   },
 });
@@ -72,7 +84,9 @@ export default defineComponent({
       <div style="display: flex; flex-direction: column; gap: 3rem">
         <div>
           <h1 class="text-4xl" style="font-weight: 600">{{ product?.name }}</h1>
-          <span class="text-xs" style="opacity: 0.8">Código do produto: {{ product?.id }}</span>
+          <span class="text-xs" style="opacity: 0.8"
+            >Código do produto: {{ product?.id }}</span
+          >
         </div>
         <!-- Price container -->
         <div>
@@ -94,18 +108,65 @@ export default defineComponent({
           </div>
         </div>
         <!-- Numbers -->
-        <div>
-          <h2>Escolha uma numeração</h2>
+        <div style="display: flex; flex-direction: column; gap: 1.25rem">
+          <h2>Escolha uma numeração:</h2>
+          <div style="display: flex; align-items: center; gap: 0.75rem">
+            <div
+              v-for="(size, index) in sizes"
+              :key="index"
+              class="sizes--block"
+              :class="{'sizes--unavailable': !product?.sizes.includes(size)}"
+              :aria-label="
+                !product?.sizes.includes(size) ? 'Produto indisponível' : 'null'
+              "
+            >
+              {{ size }}
+              <span
+                class="sizes--slash"
+                v-if="!product?.sizes.includes(size)"
+                aria-hidden="true"
+              ></span>
+            </div>
+          </div>
+          <h3 style="opacity: 0.6">Guia de tamanhos</h3>
           <div>
-
+            <select name="" id="">
+              <option disabled selected>Escolha quantas unidades</option>
+              <option value="1">1</option>
+              <option value="2">2</option>
+              <option value="3">3</option>
+              <option value="4">4</option>
+              <option value="5">5</option>
+            </select>
           </div>
         </div>
+        <button class="button gradient--button">Comprar</button>
       </div>
     </div>
   </main>
 </template>
 
-<style>
+<style scoped>
+.sizes--slash {
+  width: 1px;
+  height: 100%;
+  background: #000;
+  position: absolute;
+  transform: rotate(45deg);
+}
+.sizes--block {
+  position: relative;
+  width: 2.5rem;
+  height: 2.5rem;
+  border: 1px solid var(--clr-gray-700);
+  display: flex;
+  align-items: center;
+  justify-content: center;
+}
+.sizes--unavailable {
+  opacity: 0.6;
+  cursor: not-allowed;
+}
 .discount--badge {
   color: var(--clr-neutral);
   font-weight: 600;
