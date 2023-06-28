@@ -1,12 +1,27 @@
-<script setup lang="ts">
+<script lang="ts">
+import { useFavoriteStore } from "@/stores/favoriteStore";
 import { Heart } from "lucide-vue-next";
+import { storeToRefs } from "pinia";
+
+export default {
+  name: "FavoritesLinks",
+  setup() {
+    const favoriteStore = useFavoriteStore();
+    const { favoriteItemsCount } = storeToRefs(favoriteStore);
+
+    return { favoriteItemsCount };
+  },
+  components: { Heart },
+};
 </script>
 
 <template>
   <div class="main__wrapper">
     <div class="icon__wrapper">
-      <Heart />
-      <span class="item__tooltip text-xs">1</span>
+      <Heart :class="{'favorite--active': favoriteItemsCount > 0}"/>
+      <p class="item__tooltip text-xs" v-if="favoriteItemsCount > 0">
+        {{ favoriteItemsCount }}
+      </p>
     </div>
     <p class="label text-sm">Lista de desejos</p>
   </div>
@@ -22,8 +37,14 @@ import { Heart } from "lucide-vue-next";
   position: relative;
   display: flex;
   align-items: center;
+  justify-content: center;
+}
+.favorite--active {
+  fill: var(--clr-accent);
+  color: var(--clr-accent);
 }
 .item__tooltip {
+  font-weight: 600;
   position: absolute;
   top: -8px;
   right: -8px;
@@ -37,7 +58,6 @@ import { Heart } from "lucide-vue-next";
   justify-content: center;
   line-height: 0;
 }
-
 .label {
   line-height: 0;
   font-weight: 500;
