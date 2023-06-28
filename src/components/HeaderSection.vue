@@ -1,7 +1,7 @@
 <script setup lang="ts">
 import { Headphones, MapPin } from "lucide-vue-next";
-import ShoppingBtn from "./ShoppingBtn.vue";
-import FavoriteBtn from "./FavoriteBtn.vue";
+import FavoritesLinks from "./FavoritesLinks.vue";
+import ShoppingCart from "./ShoppingCart.vue";
 </script>
 
 <template>
@@ -26,10 +26,10 @@ import FavoriteBtn from "./FavoriteBtn.vue";
       <nav class="header__navigation">
         <ul class="flex-list">
           <li>
-            <FavoriteBtn />
+            <FavoritesLinks />
           </li>
           <li>
-            <ShoppingBtn />
+            <ShoppingCart />
           </li>
         </ul>
       </nav>
