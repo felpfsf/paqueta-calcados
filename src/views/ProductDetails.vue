@@ -1,85 +1,98 @@
 <script lang="ts">
+import ProductSliderCard from '@/components/ProductSliderCard.vue';
 import api from "@/services/api";
 import { ShoesProps } from "@/types/shoes.models";
+import {
+calculateProductDiscount,
+discountedPrice,
+formatCurrency,
+getInstallments,
+} from "@/utils/price-helpers";
 import { defineComponent, onMounted, ref } from "vue";
 import { useRoute } from "vue-router";
 
 export default defineComponent({
-  name: "Product Details",
+  name: "ProductDetails",
   setup() {
     const product = ref<ShoesProps | null>(null);
+    const products = ref<ShoesProps[] | null>(null);
     const route = useRoute();
+    const selectedSize = ref<number | null>(null);
+    const selectedQuantity = ref<number | null>(null);
+    const quantityOptions = [1, 2, 3, 4, 5];
 
-    const GET_RANDOM_LENGTH = Math.floor(Math.random() * 7) + 1;
-    const randomSizes = Array.from(
-      { length: GET_RANDOM_LENGTH },
-      (_, i) => i + 34
-    );
-    const sizes = Array.from({ length: 7 }, (_, i) => i + 34);
     const fetchProduct = async () => {
       try {
         const { id } = route.params;
         // console.log(id);
         const response = await api.get(`/shoe/${id}`);
         // console.log("Produto -> ", response.data[0]);
-
         const productData = response.data[0];
+        const randomSizes = generateRandomSizes();
         productData.sizes = randomSizes;
-        console.log(productData);
         product.value = productData;
-        console.log(product);
-      } catch (error) {
-        console.error(error);
+      } catch (e) {
+        console.error(e);
       }
     };
 
-    const formatCurrency = (value: number | undefined) => {
-      if (value === undefined || value === null) {
-        return "";
+    const fetchProducts = async () => {
+      try {
+        const response = await api.get('/shoes')        
+        const productData = response.data;
+        const randomProducts = productData.slice().sort(()=>0.5 - Math.random()).slice(0, 4)
+        products.value = randomProducts
+      } catch (e) {
+        console.error(e);
       }
+    }
 
-      const formatter = new Intl.NumberFormat("pt-BR", {
-        style: "currency",
-        currency: "BRL",
-      });
 
-      return formatter.format(value);
-    };
-
-    const productDiscountCalc = (value: number | undefined) => {
-      if (!value) return;
-      return value * 100;
-    };
-
-    const discountedPrice = (value: number | undefined) => {
-      const discount = product.value?.price.discount;
-      if (!value || !discount) return;
-      return value - value * discount;
-    };
-
-    const getInstallments = (value: number | undefined) => {
-      const INSTALLMENTS = 9;
-      if (!value) return;
-      return value / INSTALLMENTS;
+    const generateRandomSizes = () => {
+      const randomLength = Math.floor(Math.random() * 7) + 1;
+      return Array.from({ length: randomLength }, (_, i) => i + 34);
     };
 
     onMounted(fetchProduct);
+    onMounted(fetchProducts);
+
+    const handlePurchase = () => {
+      const data = {
+        name: product.value?.name,
+        id: product.value?.id,
+        size: selectedSize.value,
+        quantity: selectedQuantity.value,
+      };
+      console.log("O producto é selecionado ->", data);
+    };
 
     return {
       product,
+      products,
+      sizes: Array.from({ length: 7 }, (_, i) => i + 34),
+      quantityOptions,
+      selectedSize,
+      selectedQuantity,
       formatCurrency,
-      productDiscountCalc,
+      calculateProductDiscount,
       discountedPrice,
       getInstallments,
-      sizes,
+      handlePurchase,
     };
   },
+  components: {ProductSliderCard}
 });
 </script>
 
 <template>
   <main class="content__wrapper" style="margin-block: 4rem">
-    <div style="display: grid; grid-template-columns: repeat(2, 1fr)">
+    <div
+      style="
+        display: grid;
+        grid-template-columns: repeat(2, 1fr);
+        margin-bottom: 4rem;
+      "
+    >
       <img :src="product?.image" alt="" />
       <div style="display: flex; flex-direction: column; gap: 3rem">
         <div>
@@ -95,19 +108,24 @@ export default defineComponent({
               {{ formatCurrency(product?.price.value) }}
             </h2>
             <span class="discount--badge text-sm">
-              {{ productDiscountCalc(product?.price.discount) }}% de desconto
+              {{ calculateProductDiscount(product?.price.discount) }}% de
+              desconto
             </span>
           </div>
           <div>
             <h2 class="price__main">
-              {{ formatCurrency(discountedPrice(product?.price.value)) }}
+              {{
+                formatCurrency(
+                  discountedPrice(product?.price.value, product?.price.discount)
+                )
+              }}
             </h2>
             <p style="opacity: 0.6">
               ou 9x {{ formatCurrency(getInstallments(product?.price.value)) }}
             </p>
           </div>
         </div>
-        <!-- Numbers -->
+        <!-- Size and Quantity selection -->
         <div style="display: flex; flex-direction: column; gap: 1.25rem">
           <h2>Escolha uma numeração:</h2>
           <div style="display: flex; align-items: center; gap: 0.75rem">
@@ -115,12 +133,25 @@ export default defineComponent({
               v-for="(size, index) in sizes"
               :key="index"
               class="sizes--block"
-              :class="{'sizes--unavailable': !product?.sizes.includes(size)}"
-              :aria-label="
-                !product?.sizes.includes(size) ? 'Produto indisponível' : 'null'
-              "
+              :class="{ 'sizes--unavailable': !product?.sizes.includes(size) }"
             >
-              {{ size }}
+              <input
+                type="radio"
+                :name="'size-radio' + index"
+                :id="'size-radio' + index"
+                :value="size"
+                :disabled="!product?.sizes.includes(size)"
+                :aria-label="
+                  !product?.sizes.includes(size)
+                    ? 'Produto indisponível'
+                    : 'null'
+                "
+                v-model="selectedSize"
+                style="visibility: hidden; width: 0; height: 0"
+              />
+              <label :for="'size-radio' + index">
+                {{ size }}
+              </label>
               <span
                 class="sizes--slash"
                 v-if="!product?.sizes.includes(size)"
@@ -130,17 +161,34 @@ export default defineComponent({
           </div>
           <h3 style="opacity: 0.6">Guia de tamanhos</h3>
           <div>
-            <select name="" id="">
-              <option disabled selected>Escolha quantas unidades</option>
-              <option value="1">1</option>
-              <option value="2">2</option>
-              <option value="3">3</option>
-              <option value="4">4</option>
-              <option value="5">5</option>
+            <label for="quantity">Escolha quantas unidades: </label>
+            <select id="quantity" v-model="selectedQuantity">
+              <option
+                v-for="quantity in quantityOptions"
+                :key="quantity"
+                :value="quantity"
+              >
+                {{ quantity }}
+              </option>
             </select>
           </div>
         </div>
-        <button class="button gradient--button">Comprar</button>
+        <button class="button gradient--button" @click="handlePurchase">
+          Comprar
+        </button>
+      </div>
+    </div>
+    <div style="display: flex; flex-direction: column; gap: 1rem;">
+      <h1 class="description__title">DESCRIÇÃO DO PRODUTO</h1>
+      <p class="text-xl">
+        {{ product?.description }}
+      </p>
+    </div>
+    <div class="divider" style="margin-block: 6.25rem;" />
+    <!-- Suggestions -->
+    <div style="display: flex; flex-direction: row; flex-wrap: wrap; justify-content: space-between;">
+      <div v-for="product in products" :key="product.id">
+        <ProductSliderCard :product="product"/>
       </div>
     </div>
   </main>
@@ -186,5 +234,11 @@ export default defineComponent({
 .price__original {
   text-decoration: line-through;
   opacity: 0.8;
+}
+.description__title {
+  color: var(--clr-gray-900);
+  font-size: 40px;
+  font-weight: 600;
+  line-height: 56px;
 }
 </style>
