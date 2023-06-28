@@ -8,7 +8,7 @@
   --clr-secondary: #ffcd29;
   --clr-accent: #cf5d00;
   --clr-danger: #ef4444;
-  --clr-success: #65C239;
+  --clr-success: #65c239;
 
   --text-xs-font-size: 0.75rem; /* 12px */
   --text-xs-line-height: 1rem; /* 16px */
@@ -121,7 +121,11 @@ body {
 }
 
 .gradient--button {
-  background: linear-gradient(122.71deg, var(--clr-primary) 53.34%, var(--clr-secondary) 133.06%);
+  background: linear-gradient(
+    122.71deg,
+    var(--clr-primary) 53.34%,
+    var(--clr-secondary) 133.06%
+  );
 }
 
 .button {
@@ -147,6 +151,13 @@ body {
   background-color: var(--clr-accent);
   font-size: 16px;
   font-weight: 600;
+}
+
+.divider {
+  width: 100%;
+  height: 1px;
+  background: var(--clr-gray-700);
+  opacity: 0.1;
 }
 
 .mainSlider {
