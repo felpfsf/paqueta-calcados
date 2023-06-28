@@ -5,6 +5,7 @@ export interface ShoesProps {
   soldout: boolean;
   image: string;
   description: string;
+  sizes: number[];
 }
 
 interface Price {
