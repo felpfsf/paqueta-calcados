@@ -58,12 +58,11 @@ export default defineComponent({
 
     const handlePurchase = () => {
       const data = {
-        name: product.value?.name,
-        id: product.value?.id,
+        product: product.value,
         size: selectedSize.value,
-        quantity: selectedQuantity.value,
-      };
-      console.log("O producto é selecionado ->", data);
+        quantity: selectedQuantity.value
+      }
+      console.log(data);
     };
 
     return {
@@ -133,7 +132,11 @@ export default defineComponent({
               v-for="(size, index) in sizes"
               :key="index"
               class="sizes--block"
-              :class="{ 'sizes--unavailable': !product?.sizes.includes(size) }"
+              :class="{ 
+                  'sizes--unavailable': !product?.sizes.includes(size), 
+                  'size--selected': selectedSize === size 
+              }"
+              
             >
               <input
                 type="radio"
@@ -147,9 +150,9 @@ export default defineComponent({
                     : 'null'
                 "
                 v-model="selectedSize"
-                style="visibility: hidden; width: 0; height: 0"
+                style="visibility: hidden; width: 0; height: 0;"
               />
-              <label :for="'size-radio' + index">
+              <label :for="'size-radio' + index" style="cursor: pointer;">
                 {{ size }}
               </label>
               <span
@@ -210,10 +213,16 @@ export default defineComponent({
   display: flex;
   align-items: center;
   justify-content: center;
+  cursor: pointer;
 }
 .sizes--unavailable {
   opacity: 0.6;
   cursor: not-allowed;
+}
+.size--selected {
+  background: var(--clr-accent);
+  color: var(--clr-neutral);
+  border: transparent;
 }
 .discount--badge {
   color: var(--clr-neutral);
