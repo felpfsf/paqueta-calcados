@@ -1,12 +1,13 @@
 <script lang="ts">
-import ProductSliderCard from '@/components/ProductSliderCard.vue';
+import ProductSliderCard from "@/components/ProductSliderCard.vue";
 import api from "@/services/api";
+import { useNewCartStore } from "@/stores/newCartStore";
 import { ShoesProps } from "@/types/shoes.models";
 import {
-calculateProductDiscount,
-discountedPrice,
-formatCurrency,
-getInstallments,
+  calculateProductDiscount,
+  discountedPrice,
+  formatCurrency,
+  getInstallments,
 } from "@/utils/price-helpers";
 import { defineComponent, onMounted, ref } from "vue";
 import { useRoute } from "vue-router";
@@ -20,6 +21,7 @@ export default defineComponent({
     const selectedSize = ref<number | null>(null);
     const selectedQuantity = ref<number | null>(null);
     const quantityOptions = [1, 2, 3, 4, 5];
+    const store = useNewCartStore();
 
     const fetchProduct = async () => {
       try {
@@ -38,15 +40,17 @@ export default defineComponent({
 
     const fetchProducts = async () => {
       try {
-        const response = await api.get('/shoes')        
+        const response = await api.get("/shoes");
         const productData = response.data;
-        const randomProducts = productData.slice().sort(()=>0.5 - Math.random()).slice(0, 4)
-        products.value = randomProducts
+        const randomProducts = productData
+          .slice()
+          .sort(() => 0.5 - Math.random())
+          .slice(0, 4);
+        products.value = randomProducts;
       } catch (e) {
         console.error(e);
       }
-    }
-
+    };
 
     const generateRandomSizes = () => {
       const randomLength = Math.floor(Math.random() * 7) + 1;
@@ -60,9 +64,36 @@ export default defineComponent({
       const data = {
         product: product.value,
         size: selectedSize.value,
-        quantity: selectedQuantity.value
+        quantity: selectedQuantity.value,
+      };
+      if (data.product && data.size && data.quantity) {
+        store.addItem({
+          product: data.product,
+          quantity: data.quantity,
+          size: data.size,
+        });
+        console.log(data);
+      } else {
+        console.error("Selecione um producto");
       }
-      console.log(data);
+    };
+
+    const handleDeleteFromCart = () => {
+      const data = {
+        product: product.value,
+        size: selectedSize.value,
+        quantity: selectedQuantity.value,
+      };
+      if (data.product && data.quantity && data.size) {
+        store.removeItem({
+          product: data.product,
+          quantity: data.quantity,
+          size: data.size,
+        });
+        console.log(data);
+      } else {
+        console.error("Não foi possível remover o produto");
+      }
     };
 
     return {
@@ -77,9 +108,10 @@ export default defineComponent({
       discountedPrice,
       getInstallments,
       handlePurchase,
+      handleDeleteFromCart,
     };
   },
-  components: {ProductSliderCard}
+  components: { ProductSliderCard },
 });
 </script>
 
@@ -132,11 +164,10 @@ export default defineComponent({
               v-for="(size, index) in sizes"
               :key="index"
               class="sizes--block"
-              :class="{ 
-                  'sizes--unavailable': !product?.sizes.includes(size), 
-                  'size--selected': selectedSize === size 
+              :class="{
+                'sizes--unavailable': !product?.sizes.includes(size),
+                'size--selected': selectedSize === size,
               }"
-              
             >
               <input
                 type="radio"
@@ -150,9 +181,9 @@ export default defineComponent({
                     : 'null'
                 "
                 v-model="selectedSize"
-                style="visibility: hidden; width: 0; height: 0;"
+                style="visibility: hidden; width: 0; height: 0"
               />
-              <label :for="'size-radio' + index" style="cursor: pointer;">
+              <label :for="'size-radio' + index" style="cursor: pointer">
                 {{ size }}
               </label>
               <span
@@ -165,7 +196,11 @@ export default defineComponent({
           <h3 style="opacity: 0.6">Guia de tamanhos</h3>
           <div>
             <label for="quantity">Escolha quantas unidades: </label>
-            <select id="quantity" v-model="selectedQuantity">
+            <select
+              id="quantity"
+              v-model="selectedQuantity"
+              style="border: 1px solid; border-radius: 0.375rem"
+            >
               <option
                 v-for="quantity in quantityOptions"
                 :key="quantity"
@@ -179,19 +214,29 @@ export default defineComponent({
         <button class="button gradient--button" @click="handlePurchase">
           Comprar
         </button>
+        <button class="button gradient--button" @click="handleDeleteFromCart">
+          Remover do Carrinho(teste)
+        </button>
       </div>
     </div>
-    <div style="display: flex; flex-direction: column; gap: 1rem;">
+    <div style="display: flex; flex-direction: column; gap: 1rem">
       <h1 class="description__title">DESCRIÇÃO DO PRODUTO</h1>
       <p class="text-xl">
         {{ product?.description }}
       </p>
     </div>
-    <div class="divider" style="margin-block: 6.25rem;" />
+    <div class="divider" style="margin-block: 6.25rem" />
     <!-- Suggestions -->
-    <div style="display: flex; flex-direction: row; flex-wrap: wrap; justify-content: space-between;">
+    <div
+      style="
+        display: flex;
+        flex-direction: row;
+        flex-wrap: wrap;
+        justify-content: space-between;
+      "
+    >
       <div v-for="product in products" :key="product.id">
-        <ProductSliderCard :product="product"/>
+        <ProductSliderCard :product="product" />
       </div>
     </div>
   </main>
