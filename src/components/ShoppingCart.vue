@@ -1,14 +1,12 @@
 <script lang="ts">
-import { useCartStore } from "@/stores/cartStore";
+import { useNewCartStore } from "@/stores/newCartStore";
 import { ShoppingBag } from "lucide-vue-next";
 import { storeToRefs } from "pinia";
 export default {
   name: "ShoppingCart",
   setup() {
-    const cartStore = useCartStore()
-    const {items} = storeToRefs(cartStore)
-    console.log(items.value.length)
-    const itemsInCart = items.value.length
+    const cartStore = useNewCartStore()
+    const {itemsInCart} = storeToRefs(cartStore)
 
     return { itemsInCart }
   },
