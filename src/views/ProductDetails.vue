@@ -1,14 +1,12 @@
 <script lang="ts">
 import ProductSliderCard from "@/components/ProductSliderCard.vue";
-import api from "@/services/api";
 import { useNewCartStore } from "@/stores/newCartStore";
 import { useProductsStore } from "@/stores/product";
-import { ShoesProps } from "@/types/shoes.models";
 import {
-  calculateProductDiscount,
-  discountedPrice,
-  formatCurrency,
-  getInstallments,
+calculateProductDiscount,
+discountedPrice,
+formatCurrency,
+getInstallments,
 } from "@/utils/price-helpers";
 import { storeToRefs } from "pinia";
 import { defineComponent, onMounted, ref } from "vue";
@@ -17,36 +15,22 @@ import { useRoute } from "vue-router";
 export default defineComponent({
   name: "ProductDetails",
   setup() {
+    const cartStore = useNewCartStore();
     const productsStore = useProductsStore();
-    const { error, product } = storeToRefs(productsStore);
-    const products = ref<ShoesProps[] | null>(null);
+    const { error, product, suggestedProducts } = storeToRefs(productsStore);
     const route = useRoute();
+    // Form
     const selectedSize = ref<number | null>(null);
     const selectedQuantity = ref<number | null>(null);
     const quantityOptions = [1, 2, 3, 4, 5];
-    const store = useNewCartStore();
 
     const fetchProduct = async () => {
       const { id } = route.params;
       await productsStore.fetchProduct(id);
     };
 
-    const fetchProducts = async () => {
-      try {
-        const response = await api.get("/shoes");
-        const productData = response.data;
-        const randomProducts = productData
-          .slice()
-          .sort(() => 0.5 - Math.random())
-          .slice(0, 4);
-        products.value = randomProducts;
-      } catch (e) {
-        console.error(e);
-      }
-    };
-
     onMounted(fetchProduct);
-    onMounted(fetchProducts);
+    onMounted(productsStore.fetchProducts);
 
     const handlePurchase = () => {
       const data = {
@@ -55,7 +39,7 @@ export default defineComponent({
         quantity: selectedQuantity.value,
       };
       if (data.product && data.size && data.quantity) {
-        store.addItem({
+        cartStore.addItem({
           product: data.product,
           quantity: data.quantity,
           size: data.size,
@@ -73,7 +57,7 @@ export default defineComponent({
         quantity: selectedQuantity.value,
       };
       if (data.product && data.quantity && data.size) {
-        store.removeItem({
+        cartStore.removeItem({
           product: data.product,
           quantity: data.quantity,
           size: data.size,
@@ -87,7 +71,7 @@ export default defineComponent({
     return {
       error,
       product,
-      products,
+      products:suggestedProducts,
       sizes: Array.from({ length: 7 }, (_, i) => i + 34),
       quantityOptions,
       selectedSize,
