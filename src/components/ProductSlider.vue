@@ -1,7 +1,7 @@
 <script lang="ts">
-import api from "@/services/api";
-import { ShoesProps } from "@/types/shoes.models";
-import { onMounted, ref } from "vue";
+import { useProductsStore } from "@/stores/product";
+import { storeToRefs } from "pinia";
+import { onMounted } from "vue";
 
 import ProductSliderCard from "./ProductSliderCard.vue";
 // Swiper
@@ -15,24 +15,16 @@ import "swiper/css/pagination";
 export default {
   name: "ProductSlider",
   setup() {
-    const products = ref<ShoesProps[]>([]);
-    const fetchProducts = async () => {
-      try {
-        const response = await api.get("/shoes");
-        console.log(Math.ceil(response.data.length / 2));
-        const limit = response.data.slice(
-          0,
-          Math.ceil(response.data.length / 2)
-        );
-        console.log(limit);
-        products.value = limit;
-      } catch (e) {
-        console.error(e);
-      }
-    };
-    onMounted(fetchProducts);
+    const productStore = useProductsStore();
+    const { error, sliderProducts } = storeToRefs(productStore);
 
-    return { modules: [Navigation, Pagination], products };
+    onMounted(productStore.fetchProducts);
+
+    return {
+      modules: [Navigation, Pagination],
+      products: sliderProducts,
+      error,
+    };
   },
   components: { ProductSliderCard, Swiper, SwiperSlide },
 };
@@ -44,6 +36,9 @@ export default {
       <h1 class="section__title text-4xl">Destaques</h1>
       <RouterLink to="/" class="link">CONFERIR TUDO</RouterLink>
     </div>
+    <div v-if="error">
+      {{ error }}
+    </div>
     <swiper
       :pagination="{ dynamicBullets: true }"
       :navigation="true"
@@ -51,6 +46,7 @@ export default {
       :slides-per-view="3.8"
       :space-between="30"
       class="mainSlider mediaSlider"
+      v-else
     >
       <swiper-slide v-for="(product, index) in products" :key="index">
         <!-- Product card -->

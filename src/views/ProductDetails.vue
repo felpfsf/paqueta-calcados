@@ -2,6 +2,7 @@
 import ProductSliderCard from "@/components/ProductSliderCard.vue";
 import api from "@/services/api";
 import { useNewCartStore } from "@/stores/newCartStore";
+import { useProductsStore } from "@/stores/product";
 import { ShoesProps } from "@/types/shoes.models";
 import {
   calculateProductDiscount,
@@ -9,13 +10,15 @@ import {
   formatCurrency,
   getInstallments,
 } from "@/utils/price-helpers";
+import { storeToRefs } from "pinia";
 import { defineComponent, onMounted, ref } from "vue";
 import { useRoute } from "vue-router";
 
 export default defineComponent({
   name: "ProductDetails",
   setup() {
-    const product = ref<ShoesProps | null>(null);
+    const productsStore = useProductsStore();
+    const { error, product } = storeToRefs(productsStore);
     const products = ref<ShoesProps[] | null>(null);
     const route = useRoute();
     const selectedSize = ref<number | null>(null);
@@ -24,18 +27,8 @@ export default defineComponent({
     const store = useNewCartStore();
 
     const fetchProduct = async () => {
-      try {
-        const { id } = route.params;
-        // console.log(id);
-        const response = await api.get(`/shoe/${id}`);
-        // console.log("Produto -> ", response.data[0]);
-        const productData = response.data[0];
-        const randomSizes = generateRandomSizes();
-        productData.sizes = randomSizes;
-        product.value = productData;
-      } catch (e) {
-        console.error(e);
-      }
+      const { id } = route.params;
+      await productsStore.fetchProduct(id);
     };
 
     const fetchProducts = async () => {
@@ -50,11 +43,6 @@ export default defineComponent({
       } catch (e) {
         console.error(e);
       }
-    };
-
-    const generateRandomSizes = () => {
-      const randomLength = Math.floor(Math.random() * 7) + 1;
-      return Array.from({ length: randomLength }, (_, i) => i + 34);
     };
 
     onMounted(fetchProduct);
@@ -97,6 +85,7 @@ export default defineComponent({
     };
 
     return {
+      error,
       product,
       products,
       sizes: Array.from({ length: 7 }, (_, i) => i + 34),
@@ -117,126 +106,135 @@ export default defineComponent({
 
 <template>
   <main class="content__wrapper" style="margin-block: 4rem">
-    <div
-      style="
-        display: grid;
-        grid-template-columns: repeat(2, 1fr);
-        margin-bottom: 4rem;
-      "
-    >
-      <img :src="product?.image" alt="" />
-      <div style="display: flex; flex-direction: column; gap: 3rem">
-        <div>
-          <h1 class="text-4xl" style="font-weight: 600">{{ product?.name }}</h1>
-          <span class="text-xs" style="opacity: 0.8"
-            >Código do produto: {{ product?.id }}</span
-          >
-        </div>
-        <!-- Price container -->
-        <div>
-          <div style="display: flex; align-items: center; gap: 1rem">
-            <h2 class="price__original">
-              {{ formatCurrency(product?.price.value) }}
-            </h2>
-            <span class="discount--badge text-sm">
-              {{ calculateProductDiscount(product?.price.discount) }}% de
-              desconto
-            </span>
-          </div>
+    <div v-if="error">{{ error }}</div>
+    <div v-else>
+      <div
+        style="
+          display: grid;
+          grid-template-columns: repeat(2, 1fr);
+          margin-bottom: 4rem;
+        "
+      >
+        <img :src="product?.image" alt="" />
+        <div style="display: flex; flex-direction: column; gap: 3rem">
           <div>
-            <h2 class="price__main">
-              {{
-                formatCurrency(
-                  discountedPrice(product?.price.value, product?.price.discount)
-                )
-              }}
-            </h2>
-            <p style="opacity: 0.6">
-              ou 9x {{ formatCurrency(getInstallments(product?.price.value)) }}
-            </p>
-          </div>
-        </div>
-        <!-- Size and Quantity selection -->
-        <div style="display: flex; flex-direction: column; gap: 1.25rem">
-          <h2>Escolha uma numeração:</h2>
-          <div style="display: flex; align-items: center; gap: 0.75rem">
-            <div
-              v-for="(size, index) in sizes"
-              :key="index"
-              class="sizes--block"
-              :class="{
-                'sizes--unavailable': !product?.sizes.includes(size),
-                'size--selected': selectedSize === size,
-              }"
+            <h1 class="text-4xl" style="font-weight: 600">
+              {{ product?.name }}
+            </h1>
+            <span class="text-xs" style="opacity: 0.8"
+              >Código do produto: {{ product?.id }}</span
             >
-              <input
-                type="radio"
-                :name="'size-radio' + index"
-                :id="'size-radio' + index"
-                :value="size"
-                :disabled="!product?.sizes.includes(size)"
-                :aria-label="
-                  !product?.sizes.includes(size)
-                    ? 'Produto indisponível'
-                    : 'null'
-                "
-                v-model="selectedSize"
-                style="visibility: hidden; width: 0; height: 0"
-              />
-              <label :for="'size-radio' + index" style="cursor: pointer">
-                {{ size }}
-              </label>
-              <span
-                class="sizes--slash"
-                v-if="!product?.sizes.includes(size)"
-                aria-hidden="true"
-              ></span>
+          </div>
+          <!-- Price container -->
+          <div>
+            <div style="display: flex; align-items: center; gap: 1rem">
+              <h2 class="price__original">
+                {{ formatCurrency(product?.price.value) }}
+              </h2>
+              <span class="discount--badge text-sm">
+                {{ calculateProductDiscount(product?.price.discount) }}% de
+                desconto
+              </span>
+            </div>
+            <div>
+              <h2 class="price__main">
+                {{
+                  formatCurrency(
+                    discountedPrice(
+                      product?.price.value,
+                      product?.price.discount
+                    )
+                  )
+                }}
+              </h2>
+              <p style="opacity: 0.6">
+                ou 9x
+                {{ formatCurrency(getInstallments(product?.price.value)) }}
+              </p>
             </div>
           </div>
-          <h3 style="opacity: 0.6">Guia de tamanhos</h3>
-          <div>
-            <label for="quantity">Escolha quantas unidades: </label>
-            <select
-              id="quantity"
-              v-model="selectedQuantity"
-              style="border: 1px solid; border-radius: 0.375rem"
-            >
-              <option
-                v-for="quantity in quantityOptions"
-                :key="quantity"
-                :value="quantity"
+          <!-- Size and Quantity selection -->
+          <div style="display: flex; flex-direction: column; gap: 1.25rem">
+            <h2>Escolha uma numeração:</h2>
+            <div style="display: flex; align-items: center; gap: 0.75rem">
+              <div
+                v-for="(size, index) in sizes"
+                :key="index"
+                class="sizes--block"
+                :class="{
+                  'sizes--unavailable': !product?.sizes.includes(size),
+                  'size--selected': selectedSize === size,
+                }"
               >
-                {{ quantity }}
-              </option>
-            </select>
+                <input
+                  type="radio"
+                  :name="'size-radio' + index"
+                  :id="'size-radio' + index"
+                  :value="size"
+                  :disabled="!product?.sizes.includes(size)"
+                  :aria-label="
+                    !product?.sizes.includes(size)
+                      ? 'Produto indisponível'
+                      : 'null'
+                  "
+                  v-model="selectedSize"
+                  style="visibility: hidden; width: 0; height: 0"
+                />
+                <label :for="'size-radio' + index" style="cursor: pointer">
+                  {{ size }}
+                </label>
+                <span
+                  class="sizes--slash"
+                  v-if="!product?.sizes.includes(size)"
+                  aria-hidden="true"
+                ></span>
+              </div>
+            </div>
+            <h3 style="opacity: 0.6">Guia de tamanhos</h3>
+            <div>
+              <label for="quantity">Escolha quantas unidades: </label>
+              <select
+                id="quantity"
+                v-model="selectedQuantity"
+                style="border: 1px solid; border-radius: 0.375rem"
+              >
+                <option
+                  v-for="quantity in quantityOptions"
+                  :key="quantity"
+                  :value="quantity"
+                >
+                  {{ quantity }}
+                </option>
+              </select>
+            </div>
           </div>
+          <button class="button gradient--button" @click="handlePurchase">
+            Comprar
+          </button>
+          <button class="button gradient--button" @click="handleDeleteFromCart">
+            Remover do Carrinho(teste)
+          </button>
         </div>
-        <button class="button gradient--button" @click="handlePurchase">
-          Comprar
-        </button>
-        <button class="button gradient--button" @click="handleDeleteFromCart">
-          Remover do Carrinho(teste)
-        </button>
       </div>
-    </div>
-    <div style="display: flex; flex-direction: column; gap: 1rem">
-      <h1 class="description__title">DESCRIÇÃO DO PRODUTO</h1>
-      <p class="text-xl">
-        {{ product?.description }}
-      </p>
-    </div>
-    <div class="divider" style="margin-block: 6.25rem" />
-    <!-- Suggestions -->
-    <div
-      style="
-        display: flex;
-        flex-direction: row;
-        flex-wrap: wrap;
-        justify-content: space-between;
-      "
-    >
-      <div v-for="product in products" :key="product.id">
-        <ProductSliderCard :product="product" />
+      <div style="display: flex; flex-direction: column; gap: 1rem">
+        <h1 class="description__title">DESCRIÇÃO DO PRODUTO</h1>
+        <p class="text-xl">
+          {{ product?.description }}
+        </p>
+      </div>
+      <div class="divider" style="margin-block: 6.25rem" />
+      <!-- Suggestions -->
+      <div
+        style="
+          display: flex;
+          flex-direction: row;
+          flex-wrap: wrap;
+          justify-content: space-between;
+        "
+      >
+        <div v-for="product in products" :key="product.id">
+          <ProductSliderCard :product="product" />
+        </div>
       </div>
     </div>
   </main>
