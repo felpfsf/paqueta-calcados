@@ -38,7 +38,7 @@ export const useProductsStore = defineStore("products", {
     async fetchProduct(id: string | string[]) {
       try {
         this.error = "";
-        const response = await api.get(`/shoes/${id}`);
+        const response = await api.get(`/shoe/${id}`);
         const productData = response.data[0];
         const randomSizes = this.generateRandomSizes();
         productData.sizes = randomSizes;
